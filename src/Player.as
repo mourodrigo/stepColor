@@ -34,7 +34,7 @@ package
 			
 			if (FlxG.keys.pressed("LEFT") && x>0) {
 				velocity.x = -xVelocity*2;
-			}else if (FlxG.keys.pressed("RIGHT") && x< FlxG.width) {
+			}else if (FlxG.keys.pressed("RIGHT") && x< FlxG.width-selfwidth) {
 				velocity.x = xVelocity*2;
 			}else {
 				velocity.x = 0;

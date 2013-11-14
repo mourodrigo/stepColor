@@ -8,7 +8,7 @@ package
 		public var lastColor:uint;
 		public var selfwidth:Number = 2;
 		public var selfheight:Number = 5;
-		public var damage;
+		public var damage:Number;
 		public function Shoot() 
 		{
 			super(0,0);

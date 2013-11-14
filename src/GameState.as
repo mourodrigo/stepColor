@@ -50,6 +50,11 @@ package
 		
 		//paths
 		public var enemyPath:FlxPath;
+		public var pathTopCircle:FlxPath;
+		public var pathSpirals:FlxPath;
+		public var pathTrapezium:FlxPath;
+		public var pathBird:FlxPath;
+		
 
 		public var wave:Number = 5;
 		
@@ -62,6 +67,9 @@ package
 		
 		override public function create():void
         {
+			//FlxG.bgColor = 0x99AAAAAA;
+			
+			/*
 			enemyPath = new FlxPath();
 			enemyPath.addPoint(makePoint(50, 10));
 			enemyPath.addPoint(makePoint(90, 10));
@@ -69,6 +77,8 @@ package
 			enemyPath.addPoint(makePoint(50, 30));
 			enemyPath.addPoint(makePoint(10, 30));
 			enemyPath.addPoint(makePoint(10, 10));
+			*/
+			
 			
 			/*
 			enemyPath.add(FlxG.width/10, FlxG.height/6);
@@ -76,6 +86,62 @@ package
 			enemyPath.add(FlxG.width-FlxG.width/10, FlxG.height/10);
 			enemyPath.add(FlxG.width/10, FlxG.height/10);
 			*/
+			
+			/*
+			pathTopCircle = new FlxPath();
+			pathTopCircle.addPoint(makePoint(15,15));
+			pathTopCircle.addPoint(makePoint(20,20));
+			pathTopCircle.addPoint(makePoint(80,20));
+			pathTopCircle.addPoint(makePoint(85,15));
+			pathTopCircle.addPoint(makePoint(80,10));
+			pathTopCircle.addPoint(makePoint(20,10));
+			
+			pathTrapezium = new FlxPath();
+			
+			pathTrapezium.addPoint(makePoint(20,10));
+			pathTrapezium.addPoint(makePoint(20,20));
+			pathTrapezium.addPoint(makePoint(50,20));
+			pathTrapezium.addPoint(makePoint(90,20));
+			pathTrapezium.addPoint(makePoint(65,70));
+			pathTrapezium.addPoint(makePoint(25,40));
+			pathTrapezium.addPoint(makePoint(75,15));
+			
+			pathBird = new FlxPath();
+			pathBird.addPoint(makePoint(50,0));
+			pathBird.addPoint(makePoint(30,20));
+			pathBird.addPoint(makePoint(5,5));
+			pathBird.addPoint(makePoint(15,5));
+			pathBird.addPoint(makePoint(8,50));
+			pathBird.addPoint(makePoint(50,65));
+			pathBird.addPoint(makePoint(92,50));
+			pathBird.addPoint(makePoint(90,5));
+			pathBird.addPoint(makePoint(95,5));
+			pathBird.addPoint(makePoint(70,20));
+			pathBird.addPoint(makePoint(40,0));
+			
+			//	pathTopCircle.addPoint(makePoint(,));
+			*/
+			pathSpirals = new FlxPath();
+			pathSpirals.addPoint(makePoint(20,0));
+			pathSpirals.addPoint(makePoint(0,20));
+			pathSpirals.addPoint(makePoint(20,40));
+			pathSpirals.addPoint(makePoint(40,20));
+			pathSpirals.addPoint(makePoint(20,10));
+			pathSpirals.addPoint(makePoint(10,15));
+			pathSpirals.addPoint(makePoint(15,25));
+			pathSpirals.addPoint(makePoint(50,50));
+			
+			pathSpirals.addPoint(makePoint(80,0));
+			pathSpirals.addPoint(makePoint(100,20));
+			pathSpirals.addPoint(makePoint(80,40));
+			pathSpirals.addPoint(makePoint(60,20));
+			pathSpirals.addPoint(makePoint(80,10));
+			pathSpirals.addPoint(makePoint(90,15));
+			pathSpirals.addPoint(makePoint(85,25));
+			
+			enemyPath = pathSpirals;
+			
+			
 			FlxG.mouse.show();
 
 			//PLAYER
@@ -180,7 +246,8 @@ package
 				
 				if (badGuy != null) {
 					//FlxG.log("badguy not null");
-					badGuy.reset(FlxG.width*FlxG.random(), 0);
+					
+					badGuy.reset(directions.head().x, 0);
 					//badGuy.velocity.x = -badGuy.xVelocity;
 					//\badGuy.velocity.y = 1;
 					badGuy.selfwidth = 10;
@@ -204,7 +271,8 @@ package
 					}
 					badGuy.followPath(directions, speed);
 					
-				
+					badGuy.pathAngle = 80;
+					
 					enemiesWave1--;
 
 				}else {
@@ -329,7 +397,7 @@ package
 			
 			bonus.kill();
 			whiteMode = true;
-			whiteModeTimerMax = 5;
+			whiteModeTimerMax = 10;
 			
 			
 		}
