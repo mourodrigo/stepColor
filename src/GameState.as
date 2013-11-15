@@ -49,6 +49,7 @@ package
 		public var dubModeTimerLeft:Number = 0;
 		public var dubModeChangeBgState:Number = 0;
 		public var dubModeColor:uint;
+		public var emitter:FlxEmitter	
 		
 		
 		//paths
@@ -65,12 +66,26 @@ package
 		[Embed(source="sounds/laser.mp3")] private var soundLaser:Class;
 		[Embed(source = "sounds/hit.mp3")] private var soundsHit:Class;
 		[Embed(source = "sounds/miss.mp3")] private var soundsMiss:Class;
-		[Embed(source="sounds/music_killTheNoise.mp3")] private var killthenoise:Class;
+	//	[Embed(source="sounds/music_killTheNoise.mp3")] private var killthenoise:Class;
 		
 		public var music:Number = 0;
 		
 		override public function create():void
         {
+	 		FlxG.timeScale = 0.5;
+			emitter = new FlxEmitter(100,100); //x and y of the emitter
+			var particles:int = 5;
+			
+			for(var i:int = 0; i < particles; i++)
+			{
+				var particle:FlxParticle = new FlxParticle();
+				particle.makeGraphic(2, 2, colorWhite);
+				particle.exists = false;
+				emitter.add(particle);
+			}
+			
+			add(emitter);
+			
 			FlxG.bgColor = 0xFF000000;
 			/*
 			enemyPath = new FlxPath();
@@ -153,7 +168,7 @@ package
 			
 			//shootsGrp
 			shootsGrp = new FlxGroup();
-			for (var i:int = 0; i < 50; i++) {
+			for (var h:int = 0; h < 50; h++) {
 				shootsGrp.add(new Shoot());
 			}
 			add(shootsGrp);
@@ -379,10 +394,17 @@ package
 				inimigo.kill();
 				FlxG.play(soundsHit, 1, false);
 				FlxG.score += 10;
+				emitter.x = inimigo.x;
+				emitter.y = inimigo.y;
+				emitter.kill();
+				emitter.revive();
+				emitter.start(true, 0.2);
 				
 			}else {
 				inimigo.currentColor = getRandomColor(wave);
-				
+				//if(inimigo.pathSpeed > enemySpeed*1.5 ){
+					inimigo.pathSpeed = inimigo.pathSpeed*1.2;	
+				//}
 				if (inimigo.width>8) {
 					inimigo.makeGraphic(inimigo.selfwidth * 0.8, inimigo.selfheight * 0.8, inimigo.currentColor);
 					inimigo.selfwidth = inimigo.selfwidth * 0.8;
@@ -533,6 +555,16 @@ package
 			
 		override public function update():void
         {
+			
+			if (FlxG.keys.justReleased("Z")) { 
+				
+				emitter.kill();
+				emitter.revive();
+				emitter.start(true, 0.5);
+				
+				
+			}
+			
 			second -= FlxG.elapsed;
 			
 			watchDubMode();
@@ -578,7 +610,7 @@ package
 					*/
 					if (backwardsMode) {
 					   enemy.pathSpeed = -enemySpeed;
-					}else {
+					}else if(!backwardsMode && enemy.pathSpeed<0){
 					   enemy.pathSpeed = enemySpeed;
 					}
 					

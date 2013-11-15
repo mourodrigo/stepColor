@@ -28,7 +28,7 @@ package
 			
 		override public function update():void {
 			super.update();
-			if (!onScreen) {
+			if (!onScreen()) {
 				kill();
 			}
 			velocity.y = 50;
