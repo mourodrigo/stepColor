@@ -11,7 +11,7 @@ package
 		public var selfwidth:Number = 20;
 		public var selfheight:Number = 20;
 		public var colorState:Number = 1;
-		public var xVelocity:Number = 50;
+		public var xVelocity:Number = 100;
 		public var currentColor:uint;
 		public var lastColor:uint;
 
@@ -33,9 +33,9 @@ package
 			}
 			
 			if (FlxG.keys.pressed("LEFT") && x>0) {
-				velocity.x = -xVelocity*2;
+				velocity.x = -xVelocity;
 			}else if (FlxG.keys.pressed("RIGHT") && x< FlxG.width-selfwidth) {
-				velocity.x = xVelocity*2;
+				velocity.x = xVelocity;
 			}else {
 				velocity.x = 0;
 			}

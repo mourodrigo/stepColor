@@ -46,6 +46,9 @@ package
 		public var whiteModeTimerMax:Number;
 		public var backwardsMode:Boolean = false;
 		public var bonus:Bonus;
+		public var dubModeTimerLeft:Number = 0;
+		public var dubModeChangeBgState:Number = 0;
+		public var dubModeColor:uint;
 		
 		
 		//paths
@@ -63,12 +66,12 @@ package
 		[Embed(source = "sounds/hit.mp3")] private var soundsHit:Class;
 		[Embed(source = "sounds/miss.mp3")] private var soundsMiss:Class;
 		[Embed(source="sounds/music_killTheNoise.mp3")] private var killthenoise:Class;
+		
 		public var music:Number = 0;
 		
 		override public function create():void
         {
-			//FlxG.bgColor = 0x99AAAAAA;
-			
+			FlxG.bgColor = 0xFF000000;
 			/*
 			enemyPath = new FlxPath();
 			enemyPath.addPoint(makePoint(50, 10));
@@ -210,9 +213,9 @@ package
 			if (second<=0) {
 					delayWave1--;
 					//FlxG.log("second ->" + second);
-					FlxG.log("interval ->" + interval);
-					FlxG.log("delaywave1 ->" + delayWave1);
-					FlxG.log("enemiesWave1 ->" + enemiesWave1);
+					//FlxG.log("interval ->" + interval);
+					//FlxG.log("delaywave1 ->" + delayWave1);
+					//FlxG.log("enemiesWave1 ->" + enemiesWave1);
 			
 		
 			}
@@ -222,7 +225,7 @@ package
 		
 		public function getRandomColor(level:Number):uint {
 			var randomcolor:Number = level * FlxG.random();
-						FlxG.log("RANDOMCOLOR! ->" + randomcolor + "level : " + level);
+						//FlxG.log("RANDOMCOLOR! ->" + randomcolor + "level : " + level);
 						if (randomcolor<=2) {
 							return colorRed;
 						}
@@ -284,7 +287,7 @@ package
 		}
 		
 		public function checkAlive():void {
-			FlxG.log(" count living" + enemyGrp.countLiving() );
+			//FlxG.log(" count living" + enemyGrp.countLiving() );
 				if (enemyGrp.countLiving() <= 0) {
 					wave++;
 					lblScore.text = "wave ->" + wave;
@@ -493,6 +496,35 @@ package
 				coloredGuy.currentColor = getRandomColor(wave);
 			}
 			
+			public function setDubMode(color:uint, time:Number):void{
+				dubModeColor = color;
+				dubModeTimerLeft = time;
+				dubModeChangeBgState = 1;
+			}
+			
+			public function watchDubMode():void{
+				FlxG.log("dubModeTimerLeft ->" + dubModeTimerLeft);
+				FlxG.log("dubModeChangeBgState" + dubModeChangeBgState);
+				FlxG.log("BACKGROUND" + FlxG.bgColor);
+				
+				if (dubModeChangeBgState==0) 
+				{
+					FlxG.bgColor = 0xFF000000;
+					dubModeTimerLeft=0;
+				}else if(dubModeChangeBgState==1 && dubModeTimerLeft>0){
+					dubModeTimerLeft -=FlxG.elapsed;
+					if(FlxG.bgColor == 0xFF000000){
+						FlxG.bgColor = 0xcccccccc;
+					}
+				}else if (dubModeChangeBgState==1 && dubModeTimerLeft<=0) 
+				{
+					
+					dubModeChangeBgState = 0;
+				}
+				
+			
+			}
+			
 			public function makePoint(x:Number, y:Number):FlxPoint {
 				return new FlxPoint((FlxG.width / 100) * x, (FlxG.height / 100) * y);
 				
@@ -502,6 +534,8 @@ package
 		override public function update():void
         {
 			second -= FlxG.elapsed;
+			
+			watchDubMode();
 			
 			lblControl();
 			
@@ -524,13 +558,13 @@ package
 					   killAll(enemy);
 					}
 					
-					if (FlxG.keys.pressed("L")){ 
+					if (FlxG.keys.pressed("C")){ 
 					   changeEnemyColor = true;
 					}else {
 						changeEnemyColor = false;
 					}
 					
-					if (FlxG.keys.pressed("D")) { 
+					if (FlxG.keys.pressed("V")) { 
 						backwardsMode = true;
 					}else {
 						backwardsMode = false;
@@ -552,9 +586,14 @@ package
 						changeEnemyColors(enemy);
 					}
 					
-					if (FlxG.keys.pressed("A")) { 
+					if (FlxG.keys.pressed("B")) { 
 						
 						bonus.reset(FlxG.width*FlxG.random(), 0);
+					}
+					
+					
+					if (FlxG.keys.pressed("D")) { 
+						setDubMode(0xFFFFFF66, 3);
 					}
 					
 					if (whiteMode) {
