@@ -5,12 +5,14 @@ package
     public class GameState extends FlxState
     {
 		//game
+		public var time:Number=0;
 		public var second:Number = 1;
 		public var lblScore:FlxText;
 		public var lblHealth:FlxText;
 		public var lblWave:FlxText;
 		public var pause:Boolean = false;
-
+		public var _hud:FlxText;
+		
 		//player
 		public var player1:Player;
 		
@@ -72,7 +74,7 @@ package
 		
 		override public function create():void
         {
-	 		FlxG.timeScale = 0.5;
+	 		
 			emitter = new FlxEmitter(100,100); //x and y of the emitter
 			var particles:int = 5;
 			
@@ -201,6 +203,10 @@ package
 			lblWave = new FlxText(0, 26, 100, "Wave: 1");
 			add(lblWave);
 			
+			_hud = new FlxText(0, FlxG.height/2, FlxG.width, "WUBWUBWUBWUBWUBWUB");
+			add(_hud);
+			_hud.setFormat(null, 20, colorWhite, "center", player1.currentColor);
+			_hud.alpha=0;
 			//FlxG.play(killthenoise, 1, false)
 			
 			//GAMEPLAY
@@ -211,6 +217,15 @@ package
 			
 			super.create();
 			 
+		}
+		
+		public function hudShow(msg:String):void{
+			_hud.text = msg;
+			_hud.alpha = 1;
+		}
+		
+		public function hudHide():void{
+			_hud.alpha = 0;
 		}
 		
 		public function watchWave(badguys:FlxGroup, interval:Number, directions:FlxPath):void {
@@ -502,7 +517,7 @@ package
 				}
 				
 
-				lblHealth.text = "Health: " + lblHealth.text;
+				lblHealth.text = time + "Health: " + lblHealth.text;
 
 				lblScore.text = "Score: " + FlxG.score;
 				
@@ -525,10 +540,11 @@ package
 			}
 			
 			public function watchDubMode():void{
+				/*
 				FlxG.log("dubModeTimerLeft ->" + dubModeTimerLeft);
 				FlxG.log("dubModeChangeBgState" + dubModeChangeBgState);
 				FlxG.log("BACKGROUND" + FlxG.bgColor);
-				
+				*/
 				if (dubModeChangeBgState==0) 
 				{
 					FlxG.bgColor = 0xFF000000;
@@ -552,19 +568,29 @@ package
 				
 			}
 			
+
+			public function isTime(currentTime:Number):Boolean{
+				var james:Number = time-currentTime;
+				if(james<0.1 && james>-0.1){
+					//FlxG.log("TRU");
+					return true
+				}
+				return false;
+			}
+			
+			public function gameControl():void{
+				if (isTime(2)) 
+				{
+					hudShow("hello!");
+				}
+			}
 			
 		override public function update():void
         {
+			time += FlxG.elapsed;
 			
-			if (FlxG.keys.justReleased("Z")) { 
-				
-				emitter.kill();
-				emitter.revive();
-				emitter.start(true, 0.5);
-				
-				
-			}
-			
+			gameControl();
+
 			second -= FlxG.elapsed;
 			
 			watchDubMode();
