@@ -6,6 +6,7 @@ package
     {
 		//game
 		public var time:Number=0;
+		public var musicTime:Number=0;
 		public var second:Number = 1;
 		public var lblScore:FlxText;
 		public var lblHealth:FlxText;
@@ -53,6 +54,12 @@ package
 		public var dubModeColor:uint;
 		public var emitter:FlxEmitter	
 		
+		public var keyLeftPressed:Boolean = false;
+		public var keyRightPressed:Boolean = false;
+		public var keyQPressed:Boolean = false;
+		public var keyWPressed:Boolean = false;
+		public var firstEnemyDown:Boolean = false;
+
 		
 		//paths
 		public var enemyPath:FlxPath;
@@ -68,7 +75,7 @@ package
 		[Embed(source="sounds/laser.mp3")] private var soundLaser:Class;
 		[Embed(source = "sounds/hit.mp3")] private var soundsHit:Class;
 		[Embed(source = "sounds/miss.mp3")] private var soundsMiss:Class;
-	//	[Embed(source="sounds/music_killTheNoise.mp3")] private var killthenoise:Class;
+	//	[Embed(source="sounds/1_Twilight_Zone.mp3")] private var musicTwilight:Class;
 		
 		public var music:Number = 0;
 		
@@ -107,7 +114,7 @@ package
 			enemyPath.add(FlxG.width/10, FlxG.height/10);
 			*/
 			
-			/*
+			
 			pathTopCircle = new FlxPath();
 			pathTopCircle.addPoint(makePoint(15,15));
 			pathTopCircle.addPoint(makePoint(20,20));
@@ -140,7 +147,7 @@ package
 			pathBird.addPoint(makePoint(40,0));
 			
 			//	pathTopCircle.addPoint(makePoint(,));
-			*/
+			
 			pathSpirals = new FlxPath();
 			pathSpirals.addPoint(makePoint(20,0));
 			pathSpirals.addPoint(makePoint(0,20));
@@ -167,7 +174,7 @@ package
 			//PLAYER
 			player1 = new Player;
 			add(player1);
-			
+			player1.alpha=0;
 			//shootsGrp
 			shootsGrp = new FlxGroup();
 			for (var h:int = 0; h < 50; h++) {
@@ -196,18 +203,20 @@ package
 			
 			lblHealth = new FlxText(0, 0, 200, "Health: |");
 			add(lblHealth);
+			lblHealth.alpha=0;
 
 			lblScore = new FlxText(0, 13, 100, "Score: 0");
 			add(lblScore);
-
+			lblScore.alpha=0;
+			
 			lblWave = new FlxText(0, 26, 100, "Wave: 1");
 			add(lblWave);
+			lblWave.alpha = 0;
 			
 			_hud = new FlxText(0, FlxG.height/2, FlxG.width, "WUBWUBWUBWUBWUBWUB");
 			add(_hud);
 			_hud.setFormat(null, 20, colorWhite, "center", player1.currentColor);
 			_hud.alpha=0;
-			//FlxG.play(killthenoise, 1, false)
 			
 			//GAMEPLAY
 			bonus = new Bonus();
@@ -217,6 +226,11 @@ package
 			
 			super.create();
 			 
+		}
+		
+		public function playMusic(musicpath:String):void{
+			FlxG.stream(musicpath, 1, false, true);	
+			musicTime = 0;
 		}
 		
 		public function hudShow(msg:String):void{
@@ -319,87 +333,99 @@ package
 		public function checkAlive():void {
 			//FlxG.log(" count living" + enemyGrp.countLiving() );
 				if (enemyGrp.countLiving() <= 0) {
-					wave++;
-					lblScore.text = "wave ->" + wave;
-					/*
-					enemyPath.remove(enemyPath.tail());
-					enemyPath.add(FlxG.width/4, FlxG.height-FlxG.height/10);
-					enemyPath.add(FlxG.width/10, FlxG.height/2);
-					enemyPath.add((FlxG.width/4)*3, FlxG.height-FlxG.height/10);
-					enemyPath.add(FlxG.width/10, FlxG.height/10);
-					enemySpeed = enemySpeed * 2;
-					*/
-					
-					switch(wave) {
-						case 2://red
-							enemiesWave1 = 4;
-							enemiesWaveLast = enemiesWave1;
-							enemyPath = new FlxPath();
-							enemyPath.addPoint(makePoint(10, 20));
-							enemyPath.addPoint(makePoint(90, 20));
-							enemyPath.addPoint(makePoint(10, 30));
-							enemyPath.addPoint(makePoint(30, 10));
-							break;
-						case 3://green
-							enemiesWave1 = 4;
-							enemiesWaveLast = enemiesWave1;
-							break;
-						case 4://green
-							enemiesWave1 = 8;
-							enemiesWaveLast = enemiesWave1;
-							enemySpeed = 60;
-							break;
-						case 5://yellow
-							enemiesWave1 = 3;
-							enemiesWaveLast = enemiesWave1;
-							break;
-						case 6://yellow
-							enemiesWave1 = 6;
-							enemiesWaveLast = enemiesWave1;
-							break;
-						case 7://blue
-							enemiesWave1 = 6;
-							enemiesWaveLast = enemiesWave1;
-							enemySpeed = 75;
-							break;
-						case 8://blue
-							enemiesWave1 = 8;
-							enemiesWaveLast = enemiesWave1;
-							break;
-						case 9:
-							enemiesWave1 = 10;
-							enemiesWaveLast = enemiesWave1;
-							break;
+					if(delayWave1<0){
 						
-						if (wave>=10) {
-							enemiesWave1 = enemiesWaveLast*2;
-							enemiesWaveLast = enemiesWave1;
+						
+						wave++;
+						lblScore.text = "wave ->" + wave;
+						/*
+						enemyPath.remove(enemyPath.tail());
+						enemyPath.add(FlxG.width/4, FlxG.height-FlxG.height/10);
+						enemyPath.add(FlxG.width/10, FlxG.height/2);
+						enemyPath.add((FlxG.width/4)*3, FlxG.height-FlxG.height/10);
+						enemyPath.add(FlxG.width/10, FlxG.height/10);
+						enemySpeed = enemySpeed * 2;
+						*/
+						
+						switch(wave) {
+							case 1:
+								break;
+							case 2://red
+								enemiesWave1 = 4;
+								enemiesWaveLast = enemiesWave1;
+								enemyPath = new FlxPath();
+								enemyPath.addPoint(makePoint(10, 20));
+								enemyPath.addPoint(makePoint(90, 20));
+								enemyPath.addPoint(makePoint(10, 30));
+								enemyPath.addPoint(makePoint(30, 10));
+								break;
+							case 3://green
+								time = 52.5;
+								enemiesWave1 = 5;
+								enemiesWaveLast = enemiesWave1;
+								break;
+							case 4://green
+								playMusic("sounds/Prepare_To_Die.mp3");
+//								FlxG.stream("sounds/1_Twilight_Zone2.mp3", 1, false, true);	
+								
+								time = 70;
+								delayWave1 = 5;
+								enemiesWave1 = 8;
+								enemiesWaveLast = enemiesWave1;
+								enemySpeed = 60;
+								break;
+							case 5://yellow
+								enemiesWave1 = 3;
+								enemiesWaveLast = enemiesWave1;
+								break;
+							case 6://yellow
+								enemiesWave1 = 6;
+								enemiesWaveLast = enemiesWave1;
+								break;
+							case 7://blue
+								enemiesWave1 = 6;
+								enemiesWaveLast = enemiesWave1;
+								enemySpeed = 75;
+								break;
+							case 8://blue
+								enemiesWave1 = 8;
+								enemiesWaveLast = enemiesWave1;
+								break;
+							case 9:
+								enemiesWave1 = 10;
+								enemiesWaveLast = enemiesWave1;
+								break;
+							
+							if (wave>=10) {
+								enemiesWave1 = enemiesWaveLast*2;
+								enemiesWaveLast = enemiesWave1;
+								
+							}
+							
 							
 						}
 						
+						/*
+						if (easy && wave <= 8) {
+							enemiesWave1 = enemiesWaveLast * 2;
+							enemiesWaveLast = enemiesWave1;
+						}else if (!easy && wave <= 8) {
+							enemiesWave1 = enemiesWaveLast;
+							enemiesWaveLast = enemiesWave1;
+						}else {
+							enemiesWave1 = 30;
+						}
+						
+						if (easy) {
+							easy = false;
+						}else {
+							easy = true;
+						}
+						*/
+						
+						
 						
 					}
-					
-					/*
-					if (easy && wave <= 8) {
-						enemiesWave1 = enemiesWaveLast * 2;
-						enemiesWaveLast = enemiesWave1;
-					}else if (!easy && wave <= 8) {
-						enemiesWave1 = enemiesWaveLast;
-						enemiesWaveLast = enemiesWave1;
-					}else {
-						enemiesWave1 = 30;
-					}
-					
-					if (easy) {
-						easy = false;
-					}else {
-						easy = true;
-					}
-					*/
-					
-					
-					
 				}
 		}
 		
@@ -407,6 +433,7 @@ package
 		public function overlapShootEnemy(tiro: Shoot, inimigo: Enemy):void {
 			if (tiro.currentColor==inimigo.currentColor || whiteMode) {
 				inimigo.kill();
+				firstEnemyDown = true;
 				FlxG.play(soundsHit, 1, false);
 				FlxG.score += 10;
 				emitter.x = inimigo.x;
@@ -579,15 +606,201 @@ package
 			}
 			
 			public function gameControl():void{
-				if (isTime(2)) 
+				FlxG.log(time);
+				/*
+				if (isTime()) 
 				{
-					hudShow("hello!");
+				hudShow("");
+				}
+				 * */
+				if (FlxG.keys.justReleased("M")) { //THE KEY 
+					
+					
+					time = 71;
+					player1.alpha = 1;
+					keyLeftPressed = true;
+					keyRightPressed = true;
+					firstEnemyDown = true;
+					keyQPressed = true;
+					lblHealth.alpha = 1;
+					lblScore.alpha = 1;
+					lblWave.alpha = 1;
+					wave = 3;
+					enemyGrp.kill();
+					enemyGrp.revive();
+					delayWave1 = 5;
+					enemiesWave1 = 8;
+					enemiesWaveLast = enemiesWave1;
+					enemySpeed = 60;
+					
+				}
+				
+				if (FlxG.keys.pressed("LEFT")) { //LEFT KEY 
+					keyLeftPressed = true;
+				}
+				
+				if (FlxG.keys.pressed("RIGHT")) { //RIGHT KEY 
+					keyRightPressed = true;
+				}
+				
+				if (FlxG.keys.pressed("Q")) { //RIGHT KEY 
+					keyQPressed = true;
+				}
+				
+				if (isTime(1)) 
+				{
+					hudShow("Welcome to stepColor!");
+				}
+				if (isTime(3)) 
+				{
+					hudShow("If you know THE KEY press it in 3...");
+				}
+				if (isTime(4)) 
+				{
+					hudShow("If you know THE KEY press it in 2...");
+				}
+				if (isTime(5)) 
+				{
+					hudShow("If you know THE KEY press it in 1...");
+				}
+				if (isTime(6)) 
+				{
+					hudShow("If you know THE KEY press it NOW!");
+				}
+				if (isTime(10)) 
+				{
+					hudShow("You don`t know THE KEY right? Ok... ");
+				}
+				
+				if (isTime(15)) 
+				{
+					hudShow("Welcome to stepColor!");
+				}
+				
+				if (isTime(20)) 
+				{
+					hudShow("This beathiful shinny red block, is you!");
+					player1.alpha = 1;
+				}
+				
+				if (isTime(23.5)) 
+				{
+					keyLeftPressed = false;
+					keyRightPressed = false;
+				}
+				
+				if (isTime(24)) 
+				{
+					hudShow("You can move to left and right using arrow keys! DO IT!");
+				}
+				
+				if (isTime(28) && (!keyLeftPressed && !keyRightPressed)) 
+				{
+					hudShow("Come on... Don`t be shine!");
+					
+				}
+				if (time>31 && (!keyLeftPressed && !keyRightPressed)) 
+				{
+					time = 23;
+					
+				}
+				
+				if (isTime(30) && (keyLeftPressed && keyRightPressed)) 
+				{
+					hudShow("Goooood boooooooy!!!");
+				}
+				if(isTime(32))
+				{
+					wave = 1;
+					enemiesWave1 = 1;
+					delayWave1 = 0;
+					//watchWave(enemyGrp, enemyTimerMax, pathTopCircle);	
+					enemyTimerMax = 1;
+					enemyPath = pathTopCircle;
+					hudShow("Ok... you have an enemy, avoid his mortal lazer shoots!");
+					firstEnemyDown = false;
+					
+					
+				}
+				if(isTime(34)){
+					lblHealth.alpha = 1;
+					lblScore.alpha = 1;
+					lblWave.alpha = 1;
+					hudShow("Press Q to fire!");
+				}
+				
+				if(time>37 && (!keyQPressed)){
+					time = 33;
+				}
+				
+				if(isTime(36)){
+					hudHide();
+				}
+					
+				
+				if(time>45 && (!firstEnemyDown)){
+					hudShow("Dude, you suck...");
+					time = 33;
+				}
+				
+				if(time>34 && time < 47 && (firstEnemyDown)){
+					hudShow("All right!");
+					time = 48;
+				}
+					
+				if(isTime(49)){
+					hudShow("Now lets have more action...");
+					wave = 2;
+					enemiesWave1 = 3;
+					//delayWave1 = 0;
+					//watchWave(enemyGrp, enemyTimerMax, pathTopCircle);	
+					enemyTimerMax = 1;
+				}
+				if(isTime(52)){
+					hudHide();
+					//time = 51;
+				}
+				
+				if(isTime(54.5) && wave==3){
+					hudShow("A GREEN one? Press W");
+				}
+				
+				if(isTime(60)){
+					hudHide();
+				}
+				
+				if(isTime(68)){
+					time = 61;
+				}
+				
+				if(isTime(71)){
+					hudShow("Please loud your sound and enjoy...");
+				}
+				
+				if(isTime(73)){
+					hudShow("Welcome to stepColor!");
+				}
+				
+				if(isTime(75)){
+					hudHide();
+//					FlxG.play(musicTwilight, 1, false)
+				}
+				
+				
+				if (player1.health<=0 && time <70) 
+				{
+					hudShow("Seriously? You're dead at the tutorial stage?");
+					player1.health = 5;
+					time = 0;
+					enemyGrp.kill();
+					enemyGrp.revive();
 				}
 			}
 			
 		override public function update():void
         {
 			time += FlxG.elapsed;
+			musicTime += FlxG.elapsed;
 			
 			gameControl();
 
@@ -596,8 +809,9 @@ package
 			watchDubMode();
 			
 			lblControl();
-			
-			watchWave(enemyGrp, enemyTimerMax, enemyPath);
+			if(time>32){
+				watchWave(enemyGrp, enemyTimerMax, enemyPath);
+			}
 			
 			testShoot();
 		
@@ -620,6 +834,10 @@ package
 					   changeEnemyColor = true;
 					}else {
 						changeEnemyColor = false;
+					}
+					
+					if (FlxG.keys.pressed("X")){ 
+						enemy.x = FlxG.width*FlxG.random();
 					}
 					
 					if (FlxG.keys.pressed("V")) { 
@@ -677,7 +895,9 @@ package
 			
 			if (second<=0) {
 				second = 1;
-				checkAlive();
+				if (time > 60){
+					checkAlive();
+				}
 			}
 			
 			if (whiteModeTimerMax<=0) {
