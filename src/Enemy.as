@@ -76,11 +76,11 @@ package
 			if (FlxU.getDistance(new FlxPoint(x,y), path.tail())<10) {
 				followPath(path, speed);
 			}
-	
+	/*
 			if (!onScreen()) {
 				kill();
 			}
-			
+		*/	
 			if (currentColor != lastColor) {
 				lastColor = currentColor;
 				makeGraphic(selfwidth, selfheight, currentColor);

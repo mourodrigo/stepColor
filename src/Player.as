@@ -20,7 +20,7 @@ package
 			super((FlxG.width / 2) - selfwidth/2, (FlxG.height) - selfheight);
 			makeGraphic(selfwidth, selfheight, 0xFFFF0000);
 		
-			health = 5;
+			health = 20;
 			}
 			
 		override public function update():void {
